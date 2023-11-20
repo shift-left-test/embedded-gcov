@@ -165,19 +165,18 @@ void __gcov_init(struct gcov_info *info)
  *
  * An example linker file segment:
 
-.ctors : {
-        __ctor_list = . ;
-        *(SORT(.ctors.*))
-        *(.ctors)
-        __ctor_end = . ;
-        . = ALIGN(16);
+.init_array : {
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array*))
+        PROVIDE_HIDDEN (__init_array_end = .);
 } > ram
 
  *
  */
 
 void __gcov_call_constructors(void) {
-    void **ctor;
+    void **init_array;
 
     /* Reinitialize static variables.
      * In case of unusual situations, where your code re-executes
@@ -199,14 +198,14 @@ void __gcov_call_constructors(void) {
     gcov_GcovIndex = 0;
 #endif
 
-    ctor = &__ctor_list;
-    while (ctor != &__ctor_end) {
+    init_array = &__init_array_start;
+    while (init_array != &__init_array_end) {
         void (*func)(void);
 
-        func = (void ( *)(void))(*(UINT32 *)ctor);
+        func = (void ( *)(void))(*(u32 *)init_array);
 
         func();
-        ctor++;
+        init_array++;
     }
 }
 #endif // GCOV_OPT_PROVIDE_CALL_CONSTRUCTORS

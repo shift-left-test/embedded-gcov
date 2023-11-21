@@ -74,17 +74,16 @@
  * if your compiler/runtime environment does not automatically.
  * An example linker file segment:
 
-.ctors : {
-        __ctor_list = . ;
-        *(SORT(.ctors.*))
-        *(.ctors)
-        __ctor_end = . ;
-        . = ALIGN(16);
+.init_array : {
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array*))
+        PROVIDE_HIDDEN (__init_array_end = .);
 } > ram
 
  */
-extern void *__ctor_list;
-extern void *__ctor_end;
+extern void *__init_array_start;
+extern void *__init_array_end;
 #endif // GCOV_OPT_PROVIDE_CALL_CONSTRUCTORS
 
 /* Provide function to clear the counter data.

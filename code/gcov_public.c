@@ -31,7 +31,7 @@
  * if something goes wrong.
  *
  * Thanassis Tsiodras
- * Real-time Embedded Software Engineer 
+ * Real-time Embedded Software Engineer
  * System, Software and Technology Department
  * European Space Agency
  *
@@ -55,9 +55,8 @@
  *		 Paul Larson
  */
 
+#include <stddef.h> // for size_t
 #include "gcov_gcc.h"
-
-typedef unsigned int u32;
 
 #if defined(GCOV_OPT_USE_MALLOC) || defined(GCOV_OPT_USE_STDLIB)
 #include <stdlib.h>
@@ -202,7 +201,7 @@ void __gcov_call_constructors(void) {
     while (init_array != &__init_array_end) {
         void (*func)(void);
 
-        func = (void ( *)(void))(*(u32 *)init_array);
+        func = (void ( *)(void))(*(size_t *)init_array);
 
         func();
         init_array++;
@@ -253,7 +252,7 @@ void __gcov_exit(void)
 
     while (listptr) {
         gcov_unsigned_t *buffer = NULL; // Need buffer to be 32-bit-aligned for type-safe internal usage
-        u32 bytesNeeded;
+        size_t bytesNeeded;
 
         /* Do pretend conversion to see how many bytes are needed */
         bytesNeeded = gcov_convert_to_gcda(NULL, listptr->info);
@@ -300,7 +299,7 @@ void __gcov_exit(void)
         /* add trailing null char */
         bf = '\0';
         (void)GCOV_WRITE_BYTE(file, bf);
-        
+
         /* write the data byte count */
         /* we don't know endianness, so use division for consistent MSB first */
         bf = (unsigned char)(bytesNeeded / 16777216);
@@ -313,7 +312,7 @@ void __gcov_exit(void)
         (void)GCOV_WRITE_BYTE(file, bf);
 
         /* write the data */
-        for (u32 i=0; i<bytesNeeded; i++) {
+        for (size_t i=0; i<bytesNeeded; i++) {
             bf = (unsigned char)(((unsigned char *)buffer)[i]);
             (void)GCOV_WRITE_BYTE(file, bf);
         }
@@ -336,7 +335,7 @@ void __gcov_exit(void)
         gcov_output_buffer[gcov_output_index++] = (unsigned char)(bytesNeeded);
 
         /* copy the data */
-        for (u32 i=0; i<bytesNeeded; i++) {
+        for (size_t i=0; i<bytesNeeded; i++) {
             gcov_output_buffer[gcov_output_index++] = (unsigned char)(((unsigned char *)buffer)[i]);
         }
 #endif // GCOV_OPT_OUTPUT_BINARY_MEMORY
@@ -345,7 +344,7 @@ void __gcov_exit(void)
         /* If your embedded system does not support printf or an imitation,
          * you'll need to change this code.
          */
-        for (u32 i=0; i<bytesNeeded; i++) {
+        for (size_t i=0; i<bytesNeeded; i++) {
             if (i%16 == 0) GCOV_PRINT_HEXDUMP_ADDR(i);
             GCOV_PRINT_HEXDUMP_DATA((unsigned char)(((unsigned char *)buffer)[i]));
             if (i%16 == 15) GCOV_PRINT_STR("\n");

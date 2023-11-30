@@ -121,7 +121,9 @@ extern void *__init_array_end;
 
 /* Modify this output filename if desired */
 /* Not used if you do not define GCOV_OPT_OUTPUT_BINARY_FILE */
+#ifndef GCOV_OUTPUT_BINARY_FILENAME
 #define GCOV_OUTPUT_BINARY_FILENAME "gcov_output.bin"
+#endif
 
 /* Modify file headers, data type and functions, if needed */
 /* Not used if you do not define GCOV_OPT_OUTPUT_BINARY_FILE */
